@@ -8,7 +8,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 public class AltarMenu extends AbstractContainerMenu {
 
@@ -22,11 +21,11 @@ public class AltarMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int i) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return false;
+        return true;
     }
 }
