@@ -1,13 +1,23 @@
 package com.cursee.cw_religions.client.gui.screens.inventory;
 
 import com.cursee.cw_religions.CWReligions;
+import com.cursee.cw_religions.client.util.ReligionContainer;
+import com.cursee.cw_religions.core.religion.Religion;
+import com.cursee.cw_religions.core.tags.PlayerTags;
 import com.cursee.cw_religions.core.world.inventory.AltarMenu;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.CreativeModeTab;
+
+import java.util.Collection;
 
 public class AltarScreen extends AbstractContainerScreen<AltarMenu> {
 
@@ -18,8 +28,11 @@ public class AltarScreen extends AbstractContainerScreen<AltarMenu> {
     public AltarScreen(AltarMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.player = playerInventory.player;
-        this.inventoryLabelY = this.height + 5;
-        this.titleLabelY = this.height + 5;
+        this.inventoryLabelY = -999;
+        this.titleLabelY = -999;
+
+        this.imageWidth = 256;
+        this.imageHeight = 144;
     }
 
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -30,8 +43,142 @@ public class AltarScreen extends AbstractContainerScreen<AltarMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+
+        Font font = Minecraft.getInstance().font;
+
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
+
         guiGraphics.blit(ALTAR_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
+
+        // todo remove
+        for (int II = 0; II < CWReligions.RELIGIONS.size(); II++) {
+            Religion religion = CWReligions.RELIGIONS.get(II);
+            guiGraphics.drawString(font, religion.symbol() + " " + religion.name(), 0, 10 + (10*II), 0xFFFFFFFF);
+        }
+
+        boolean hasReligion = this.player.getTags().stream().anyMatch(string -> string.equalsIgnoreCase(PlayerTags.FOLLOWING_RELIGION));
+        if (!hasReligion) {
+
+            /// Buttons
+
+            // 'Confess' darkened background
+            guiGraphics.blit(ALTAR_LOCATION, i + 88, j + 18, 102, 190, 50, 20);
+            // 'Sacrifice' darkened background
+            guiGraphics.blit(ALTAR_LOCATION, i + 143, j + 18, 102, 190, 50, 20);
+            // 'Pray' darkened background
+            guiGraphics.blit(ALTAR_LOCATION, i + 198, j + 18, 102, 190, 50, 20);
+
+            // 'Rules' darkened background
+            guiGraphics.blit(ALTAR_LOCATION, i + 88, j + 63, 102, 190, 50, 20);
+            // 'Relations' darkened background
+            guiGraphics.blit(ALTAR_LOCATION, i + 143, j + 63, 102, 190, 50, 20);
+            // 'Ranks' darkened background
+            guiGraphics.blit(ALTAR_LOCATION, i + 198, j + 63, 102, 190, 50, 20);
+        }
+
+        if (hasReligion) {
+
+            /// Display text
+
+            guiGraphics.drawString(font, "Maximum Piety", i + 7, j + 7, 0xFFFF0000, false);
+            guiGraphics.drawString(font, "Current Piety", i + 7, j + 20, 0xFF0000FF, false);
+            guiGraphics.drawString(font, "Member Count", i + 7, j + 33, 0xFFFFFFFF, false);
+            guiGraphics.drawString(font, "Priest Count", i + 7, j + 46, 0xFFFFFFFF, false);
+        }
+
+        guiGraphics.drawCenteredString(font, "Confess", i + 113, j + 24, 0xFFFFFFFF);
+        guiGraphics.drawCenteredString(font, "Sacrifice", i + 168, j + 24, 0xFFFFFFFF);
+        guiGraphics.drawCenteredString(font, "Pray", i + 223, j + 24, 0xFFFFFFFF);
+
+        guiGraphics.drawCenteredString(font, "Rules", i + 113, j + 69, 0xFFFFFFFF);
+        guiGraphics.drawCenteredString(font, "Relations", i + 168, j + 69, 0xFFFFFFFF);
+        guiGraphics.drawCenteredString(font, "Ranks", i + 223, j + 69, 0xFFFFFFFF);
+
+        guiGraphics.drawCenteredString(font, "View Religions", i + 58, j + 122, 0xFFFFFFFF);
+
+        // guiGraphics.drawString(font, String.valueOf(mouseX), 0, 0, 0xFFFFFFFF);
+        // guiGraphics.drawString(font, String.valueOf(mouseY), 0, 10, 0xFFFFFFFF);
+        // guiGraphics.drawString(font, String.valueOf(withinBounds(mouseX, i + 8, i + 107)), 0, 20, 0xFFFFFFFF);
+        // guiGraphics.drawString(font, String.valueOf(withinBounds(mouseY, j + 116, j + 135)), 0, 30, 0xFFFFFFFF);
+        // guiGraphics.drawString(font, String.valueOf(withinBounds(mouseX, i + 8, i + 107) && withinBounds(mouseY, j + 116, j + 135)), 0, 40, 0xFFFFFFFF);
+
+        if (withinBounds(mouseX, i + 8, i + 107) && withinBounds(mouseY, j + 116, j + 135)) {
+            // System.out.println(true);
+            guiGraphics.fill(i + 8, j + 116, i + 107, j + 135, 0x55DDDDFF);
+        }
     }
+
+    private static boolean withinBounds(int value, int lower, int upper) {
+        return value >= lower && value <= upper;
+    }
+
+    private float scrollOffs;
+
+    private void refreshCurrentTabContents() {
+        int i = this.menu.getRowIndexForScroll(this.scrollOffs);
+        this.menu.religions.clear();
+        this.refreshSearchResults();
+        this.scrollOffs = this.menu.getScrollForRowIndex(i);
+        this.menu.scrollTo(this.scrollOffs);
+    }
+
+    private void slotClick(Slot slot, int slotID, int mouseButton, ClickType type) {}
+
+    @Override
+    public boolean charTyped(char codePoint, int modifiers) {
+        return super.charTyped(codePoint, modifiers);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) Minecraft.getInstance().player.closeContainer();
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        return super.keyReleased(keyCode, scanCode, modifiers);
+    }
+
+    private void refreshSearchResults() {}
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    private boolean canScroll() {
+        return false;
+    }
+
+    private void selectTab(CreativeModeTab tab) {}
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        return super.mouseScrolled(mouseX, mouseY, delta);
+    }
+
+    protected boolean insideScrollbar(double mouseX, double mouseY) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    protected boolean checkTabClicked(CreativeModeTab creativeModeTab, double relativeMouseX, double relativeMouseY) {
+        return false;
+    }
+
+    protected boolean checkTabHovering(GuiGraphics guiGraphics, CreativeModeTab creativeModeTab, int mouseX, int mouseY) {
+        return false;
+    }
+
 }

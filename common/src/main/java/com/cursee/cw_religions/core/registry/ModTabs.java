@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
 public class ModTabs {
 
     public static final CreativeModeTab.Builder CW_RELIGIONS = Services.PLATFORM.tabBuilder()
-            .icon(() -> new ItemStack(ModBlocks.ALTAR))
+            .icon(() -> new ItemStack(ModItems.CW_RELIGIONS))
             .title(Component.translatable("itemGroup.religionsCW"))
             .displayItems((itemDisplayParameters, output) -> output.accept(ModBlocks.ALTAR));
 
