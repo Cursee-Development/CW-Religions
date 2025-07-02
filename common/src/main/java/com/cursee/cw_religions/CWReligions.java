@@ -12,10 +12,14 @@ public class CWReligions {
     public static List<Religion> RELIGIONS = new ArrayList<>();
 
     public static void init() {
-        if (addDebugDefaultReligions) {
-            RELIGIONS.add(new Religion('╘', "Esquires"));
-            RELIGIONS.add(new Religion('▌', "La Bomba-Testo"));
-            RELIGIONS.add(new Religion('á', "Rick!Rick"));
+        addDebugDefaultReligions(RELIGIONS);
+    }
+
+    public static void addDebugDefaultReligions(List<Religion> religionList) {
+        if (addDebugDefaultReligions && religionList.isEmpty()) {
+            religionList.add(new Religion('╘', "Esquires"));
+            religionList.add(new Religion('▌', "La Bomba-Testo"));
+            religionList.add(new Religion('á', "Rick!Rick"));
         }
     }
 

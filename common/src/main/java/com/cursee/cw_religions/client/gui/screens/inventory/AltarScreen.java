@@ -1,7 +1,6 @@
 package com.cursee.cw_religions.client.gui.screens.inventory;
 
 import com.cursee.cw_religions.CWReligions;
-import com.cursee.cw_religions.client.util.ReligionContainer;
 import com.cursee.cw_religions.core.religion.Religion;
 import com.cursee.cw_religions.core.tags.PlayerTags;
 import com.cursee.cw_religions.core.world.inventory.AltarMenu;

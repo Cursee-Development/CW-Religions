@@ -43,7 +43,7 @@ public class ReligionsSyncS2CPacket {
         List<Religion> religionsRead = Lists.newArrayList();
         for (int i = 0; i < total; i++) {
             String religionString = compoundTag.readUtf().replaceAll("R([0-9]+);", "");
-            Religion religion = new Religion(religionString.charAt(religionString.length() - 1), religionString.substring(0, religionString.lastIndexOf(",") - 1));
+            Religion religion = new Religion(religionString.charAt(religionString.length() - 1), religionString.substring(0, religionString.lastIndexOf(",")));
             religionsRead.add(religion);
         }
 

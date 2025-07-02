@@ -16,6 +16,7 @@ public class ModRegistryForge {
     public static void register(final IEventBus modEventBus) {
         bind(Registries.BLOCK, ModBlocks::register);
         bind(Registries.ITEM, ModItems::register);
+        bind(Registries.MENU, ModMenus::register);
 
         bind(Registries.CREATIVE_MODE_TAB, ModTabs::register);
         bind(Registries.BLOCK_ENTITY_TYPE, ModBlockEntities::register);
